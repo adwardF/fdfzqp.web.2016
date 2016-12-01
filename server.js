@@ -1,10 +1,33 @@
 var http = require('http');
+var fs = require('fs');
+var events = require('events');
 
-http.createServer(function (request, response) {
+is_exists = (filename) => 
+{
+    try
+    {
+        fs.accessSync(filename,fs.R_OK);
+    }
+    catch(err)
+    {
+        return false;
+    }
+    return true;
+}
 
-	response.writeHead(200, {'Content-Type': 'text/plain'});
+var eventEmitter = new events.EventEmitter();
 
-	response.end('Hello World\n');
+http.createServer(function (request, response) 
+{
+    if(is_exists('data' + request.url))
+    {
+        fs.readFile('data' + request.url,(err,data) => 
+            {response.writeHeader(200);
+             response.end(data)});
+    }
+    else 
+    {
+        response.writeHeader(404);
+        response.end('23333');
+    }
 }).listen(8888);
-
-console.log('Server running at http://127.0.0.1:8888/');
